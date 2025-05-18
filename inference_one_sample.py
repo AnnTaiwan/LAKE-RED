@@ -32,7 +32,7 @@ from math import sqrt
 from argparse import ArgumentParser
 
 import uuid
-
+from math import ceil
 ##create model
 def create_model(device, yaml_path, model_path):
     #load config and checkpoint
@@ -47,7 +47,7 @@ def process_data(image_pth,mask_pth,kernel_size=2):
     mask = cv2.imread(mask_pth, cv2.IMREAD_GRAYSCALE)
     original_size = mask.shape
     kernel = np.ones((kernel_size, kernel_size), np.uint8)
-    dilated_mask = cv2.dilate(mask, kernel, iterations=1)
+    dilated_mask = cv2.dilate(mask, kernel, iterations=1) # Dilate the mask to make the 1 area background larger in order to decrease inpainting artifacts
     dilated_mask = Image.fromarray(dilated_mask) 
     dilated_mask = np.expand_dims(dilated_mask, axis=2)
     dilated_mask = dilated_mask.astype(np.float32) / 255.0#
@@ -92,7 +92,8 @@ def inference(args):
     model,sampler=create_model(device, args.yaml_path, args.model_path)
     model.eval()
 
-    logpath = os.path.join(args.log_path, args.image.split('/')[-1].replace('.','_'))
+    # logpath = os.path.join(args.log_path, args.image.split('/')[-1].replace('.','_'))
+    logpath = os.path.join(args.log_path, args.image.split('\\')[-1].replace('.','_'))
     if not os.path.exists(logpath):
         os.makedirs(logpath)
     try:
@@ -109,12 +110,12 @@ def inference(args):
         
         shape = (c.shape[1]-1,)+c.shape[2:]
         
-        c = c.expand(args.batchsize, -1,-1,-1)
+        c = c.expand(int(args.batchsize), -1,-1,-1)
         
         cond = c
         
         # diffusion process
-        samples_ddim, _ = sampler.sample(S=args.Steps,
+        samples_ddim, _ = sampler.sample(S=int(args.Steps),
                                     conditioning=cond,
                                     batch_size=c.shape[0],
                                     shape=shape,
@@ -151,7 +152,7 @@ def inference(args):
         # additionally, save as grid
         grid = torch.stack(all_samples, 0)
         grid = rearrange(grid, 'n b c h w -> (n b) c h w')
-        grid = make_grid(grid, nrow=int(sqrt(args.batchsize)))
+        grid = make_grid(grid, nrow=int(ceil(sqrt(int(args.batchsize)))))
 
         # to image
         grid = 255. * rearrange(grid, 'c h w -> h w c').cpu().numpy()
