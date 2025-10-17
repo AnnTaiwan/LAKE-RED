@@ -2,9 +2,9 @@
 setlocal enabledelayedexpansion
 
 :: set folders
-set image_folder=..\data\obstacle_dataset\images
-set mask_folder=..\data\obstacle_dataset\masks
-set log_path=demo_obstacle
+set image_folder=..\data\obstacle_dataset\images2
+set mask_folder=..\data\obstacle_dataset\masks2
+set log_path=demo_obstacle2
 
 :: loop over all images
 for %%I in (%image_folder%\*.jpg) do (

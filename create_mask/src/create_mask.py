@@ -8,8 +8,8 @@ from ultralytics import YOLO
 '''
 Must run this code at this dir: D:/NSYSU_Fourth_grade/cv_final_project/LAKE-RED/create_mask/src
 '''
-SRC_DIR = "../../../data/obstacle_dataset/camo_images" # original images
-DEST_DIR = "../../../data/obstacle_dataset/camo_masks/" # mask images
+SRC_DIR = "../../../data/obstacle_dataset/images2" # original images
+DEST_DIR = "../../../data/obstacle_dataset/masks2/" # mask images
 
 def do_segmentation(path, model, conf, dst_dir=DEST_DIR):
     img_bgr = cv2.imread(path) # 0-255
